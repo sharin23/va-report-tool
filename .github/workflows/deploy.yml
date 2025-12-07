@@ -3,11 +3,11 @@ name: Deploy VA Report Tool
 on:
   push:
     branches:
-      - main  # or your deployment branch
+      - main
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - name: Checkout code
@@ -25,23 +25,9 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Copy code to server
-        uses: appleboy/ssh-action@v0.1.6
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          port: 22
-          source: "."
-          target: "/home/vauser/projects/va-report-tool/"
-
-      - name: Restart systemd service
-        uses: appleboy/ssh-action@v0.1.6
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          port: 22
-          script: |
-            sudo systemctl daemon-reload
-            sudo systemctl restart va-report
+      - name: Restart VA Report Tool service safely
+        run: |
+          sudo fuser -k 5000/tcp || true
+          sudo systemctl daemon-reload
+          sudo systemctl restart va-report
+          sudo systemctl status va-report --no-pager
