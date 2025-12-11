@@ -6,7 +6,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: self-hosted   # <-- Use your self-hosted runner now
+    runs-on: Ubuntu24
 
     steps:
     - name: Checkout repo
