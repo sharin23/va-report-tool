@@ -1,33 +1,27 @@
-name: Deploy VA Report Tool
+name: Flask CI/CD
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   deploy:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout repo
+      uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.11
-
-      - name: Install dependencies
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Restart VA Report Tool service safely
-        run: |
-          sudo fuser -k 5000/tcp || true
-          sudo systemctl daemon-reload
-          sudo systemctl restart va-report
-          sudo systemctl status va-report --no-pager
+    - name: Deploy to VM
+      env:
+        VM_USER: vauser
+        VM_HOST: <VM_IP>   # Replace with your VM IP
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh -o StrictHostKeyChecking=no $VM_USER@$VM_HOST "
+          cd ~/projects/va-report-tool &&
+          git pull &&
+          sudo systemctl restart flaskapp.service
+        "
