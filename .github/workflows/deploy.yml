@@ -6,7 +6,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: Ubuntu24
+    runs-on: [self-hosted, Ubuntu24]
 
     steps:
     - name: Checkout repo
