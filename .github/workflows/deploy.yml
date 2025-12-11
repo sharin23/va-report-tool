@@ -15,7 +15,7 @@ jobs:
     - name: Deploy to VM
       env:
         VM_USER: vauser
-        VM_HOST: <VM_IP>   # Replace with your VM IP
+        VM_HOST: 10.0.2.15
       run: |
         mkdir -p ~/.ssh
         echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_rsa
